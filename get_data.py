@@ -46,6 +46,7 @@ def get_zhdataset(data):
         nowdata["history"] = get_translate(history)["trans_result"][0]["dst"]
         nowdata["question"] = get_translate(question)["trans_result"][0]["dst"]
         nowdata["rewrite"] = get_translate(rewrite)["trans_result"][0]["dst"]
+
     zhdataset.append(nowdata)
     return zhdataset
 
