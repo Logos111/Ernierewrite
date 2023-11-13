@@ -3,6 +3,7 @@ import requests
 import random
 import hmac
 import hashlib
+from tqdm import tqdm
 
 
 def mdsign(data):
@@ -36,19 +37,15 @@ def get_translate(query):
 
 def get_zhdataset(data):
     zhdataset = []
-    i = 0
-    for sample in data:
-        if i >= 10:
-            break
-        i = i + 1
+    for sample in tqdm(data[:10], desc="Processing"):
         nowdata = {}
         history = sample["History"]
         question = sample["Question"]
         rewrite = sample["Rewrite"]
         history = "|".join(history)
-        nowdata["history"] = get_translate(history)
-        nowdata["question"] = get_translate(question)
-        nowdata["rewrite"] = get_translate(rewrite)
+        nowdata["history"] = get_translate(history)["trans_result"][0]["dst"]
+        nowdata["question"] = get_translate(question)["trans_result"][0]["dst"]
+        nowdata["rewrite"] = get_translate(rewrite)["trans_result"][0]["dst"]
     zhdataset.append(nowdata)
     return zhdataset
 
@@ -68,5 +65,5 @@ if __name__ == "__main__":
         testdata = json.load(f)
 
     zhtraindata = get_zhdataset(traindata)
-    with open("result.json", "w") as file:
-        json.dump(zhtraindata, file)
+    with open("result.json", "a+", encoding="utf-8") as file:
+        json.dump(zhtraindata, file, indent=4, ensure_ascii=False)
