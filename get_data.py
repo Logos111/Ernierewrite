@@ -37,17 +37,18 @@ def get_translate(query):
 
 def get_zhdataset(data):
     zhdataset = []
-    for sample in tqdm(data[:10], desc="Processing"):
+    trans_rewrite = ""
+    for sample in tqdm(data[:1], desc="Processing"):
         nowdata = {}
-        history = sample["History"]
+        history = "|".join(sample["History"])
         question = sample["Question"]
         rewrite = sample["Rewrite"]
-        history = "|".join(history)
-        nowdata["history"] = get_translate(history)["trans_result"][0]["dst"]
+        # history = history[-1]
+        nowdata["history"] = [get_translate(history)["trans_result"][0]["dst"]]
         nowdata["question"] = get_translate(question)["trans_result"][0]["dst"]
-        nowdata["rewrite"] = get_translate(rewrite)["trans_result"][0]["dst"]
-
-    zhdataset.append(nowdata)
+        trans_rewrite = get_translate(rewrite)["trans_result"][0]["dst"]
+        nowdata["rewrite"] = trans_rewrite
+        zhdataset.append(nowdata)
     return zhdataset
 
 
@@ -65,6 +66,14 @@ if __name__ == "__main__":
     with open(file + testpath, "r") as f:
         testdata = json.load(f)
 
-    zhtraindata = get_zhdataset(traindata)
-    with open("result.json", "a+", encoding="utf-8") as file:
-        json.dump(zhtraindata, file, indent=4, ensure_ascii=False)
+    # zhtraindata = get_zhdataset(traindata)
+    # print(len(zhtraindata))
+    # with open("train_zh.json", "w", encoding="utf-8") as file:
+    #     json.dump(zhtraindata, file, indent=4, ensure_ascii=False)
+    testdata_zh = get_zhdataset(testdata)
+    print(len(testdata_zh))
+    with open("test_zh.json", "w", encoding="utf-8") as file:
+        json.dump(testdata_zh, file, indent=4, ensure_ascii=False)
+    # devdata_zh = get_zhdataset(devdata)
+    # with open("dev_zh.json", "w", encoding="utf-8") as file:
+    #     json.dump(devdata_zh, file, indent=4, ensure_ascii=False)
